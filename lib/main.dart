@@ -1,5 +1,5 @@
 // Aluno: Vinicius Silvestre
-// Aplicativo: Turismo na Baixada Santista - Etapa 2
+// Aplicativo: Turismo na Baixada Santista
 import 'package:flutter/material.dart';
 
 void main() {
@@ -31,19 +31,28 @@ class PontoTuristico {
   final String cidade;
   final String descricao;
   final String imagem;
+  bool favorito;
+  bool visitado;
 
-  const PontoTuristico({
+  PontoTuristico({
     required this.nome,
     required this.cidade,
     required this.descricao,
     required this.imagem,
+    this.favorito = false,
+    this.visitado = false,
   });
 }
 
-class TelaCatalogo extends StatelessWidget {
+class TelaCatalogo extends StatefulWidget {
   const TelaCatalogo({super.key});
 
-  static const List<PontoTuristico> pontos = [
+  @override
+  State<TelaCatalogo> createState() => _TelaCatalogoState();
+}
+
+class _TelaCatalogoState extends State<TelaCatalogo> {
+  final List<PontoTuristico> pontos = [
     PontoTuristico(
       nome: 'Museu do Café',
       cidade: 'Santos',
@@ -88,7 +97,19 @@ class TelaCatalogo extends StatelessWidget {
     ),
   ];
 
-  Widget construirCartao(PontoTuristico ponto) {
+  void alterarFavorito(int indice, bool? marcado) {
+    setState(() {
+      pontos[indice].favorito = marcado ?? false;
+    });
+  }
+
+  void alterarVisitado(int indice, bool? marcado) {
+    setState(() {
+      pontos[indice].visitado = marcado ?? false;
+    });
+  }
+
+  Widget construirCartao(PontoTuristico ponto, int indice) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       padding: const EdgeInsets.all(12),
@@ -132,6 +153,33 @@ class TelaCatalogo extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(ponto.descricao),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: ponto.favorito,
+                      onChanged: (valor) => alterarFavorito(indice, valor),
+                    ),
+                    const Flexible(child: Text('Favorito')),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: ponto.visitado,
+                      onChanged: (valor) => alterarVisitado(indice, valor),
+                    ),
+                    const Flexible(child: Text('Visitado')),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -152,7 +200,7 @@ class TelaCatalogo extends StatelessWidget {
       ),
       body: ListView.builder(
         itemCount: pontos.length,
-        itemBuilder: (context, indice) => construirCartao(pontos[indice]),
+        itemBuilder: (context, indice) => construirCartao(pontos[indice], indice),
       ),
     );
   }
